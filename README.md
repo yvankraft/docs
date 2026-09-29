@@ -1,36 +1,54 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DocuBase — squelette de documentation
 
-## Getting Started
+Base de connaissances / documentation technique avec sommaire en sections,
+recherche instantanée (⌘K), table des matières automatique et back-office
+d'édition (Tiptap).
 
-First, run the development server:
+## Stack
+
+- Next.js 16 + React 19 + TypeScript
+- Prisma 7 + PostgreSQL
+- Better Auth (rôle `ADMIN`)
+- Tiptap (édition riche), Tailwind CSS v4, Base UI
+
+## Fonctionnalités
+
+- **Sommaire arborescent** : sections ordonnées + pages ordonnées
+- **TOC auto** : extraite des `h2`/`h3` avec scroll-spy
+- **Recherche** : `/api/search` + dialog ⌘K
+- **Prev/Next** : navigation linéaire à travers tout le sommaire
+- **Brouillons** : `published=false` invisible publiquement
+- **Admin** : CRUD sections/pages, journal d'activité, paramètres profil
+- **SEO** : sitemap.xml, robots.txt, canonical par page
+
+## Démarrage
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+cp .env.example .env   # renseigner DATABASE_URL + BETTER_AUTH_SECRET
+pnpm install
+pnpm db:push
+pnpm db:seed           # admin@example.com / password123
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+app/
+  docs/[...slug]/page.tsx  → page publique + TOC + prev/next
+  docs/page.tsx            → redirige vers la 1ʳᵉ page
+  (admin)/admin/           → sections, pages, activité, paramètres
+  api/search               → recherche (titre/extrait/contenu)
+  api/upload               → images (Vercel Blob)
+lib/
+  toc.ts                   → extraction h2/h3 + ancres
+  queries.ts               → getDocTree, getAdjacentPages…
+  actions/                 → sections, pages, users
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Limites assumées
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Pas de versioning/éditions : le contenu est la vérité courante
+- Recherche par `contains` (suffisant pour <10k pages ; prévoir
+  Postgres FTS ou un moteur externe au-delà)
+- Un seul rôle (ADMIN) : tout utilisateur connecté peut tout éditer
