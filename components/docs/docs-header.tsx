@@ -14,7 +14,13 @@ import { SearchDialog } from "@/components/docs/search-dialog";
 import { SidebarNav, type DocTree } from "@/components/docs/sidebar-nav";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
-export function DocsHeader({ tree }: { tree: DocTree }) {
+export function DocsHeader({
+  tree,
+  showAdmin,
+}: {
+  tree: DocTree;
+  showAdmin?: boolean;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -46,11 +52,13 @@ export function DocsHeader({ tree }: { tree: DocTree }) {
       <div className="ml-auto flex items-center gap-2">
         <SearchDialog />
         <ThemeToggle />
-        <Link href="/admin">
-          <Button variant="ghost" size="sm">
-            Admin
-          </Button>
-        </Link>
+        {showAdmin && (
+          <Link href="/admin">
+            <Button variant="ghost" size="sm">
+              Admin
+            </Button>
+          </Link>
+        )}
       </div>
     </header>
   );

@@ -1,6 +1,7 @@
 import { DocsHeader } from "@/components/docs/docs-header";
 import { SidebarNav } from "@/components/docs/sidebar-nav";
 import { getDocTree } from "@/lib/queries";
+import { getSessionUser, isAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -9,11 +10,11 @@ export default async function DocsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const tree = await getDocTree();
+  const [tree, user] = await Promise.all([getDocTree(), getSessionUser()]);
 
   return (
     <div className="flex min-h-screen flex-col">
-      <DocsHeader tree={tree} />
+      <DocsHeader tree={tree} showAdmin={!!user && isAdmin(user)} />
       <div className="mx-auto flex w-full max-w-7xl flex-1">
         <aside className="sticky top-14 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 overflow-y-auto border-r py-8 pr-4 pl-6 lg:block">
           <SidebarNav tree={tree} />
